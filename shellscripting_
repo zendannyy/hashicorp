@@ -1,0 +1,309 @@
+bash
+
+bash executables are in /usr/bin/
+can be located with which 
+ex: which chage will give /usr/bin/chage
+to get help on the command, man chage
+
+shell built-ins can be located with type -a 
+ex: type -a echo w
+ex: type -a getopts
+ex:type -a read
+type pwd 
+pwd is a shell builtin
+
+to only confirm if it is a builtin or not use type 
+ex: type echo
+
+to get help on the command, help echo
+note: echo is a shell built-in and an executable
+
+ 
+
+
+Bash cheatsheet 
+https://devhints.io/bash
+
+
+Vi cheats 
+https://gist.github.com/awidegreen/3854277
+
+Steps to create vagrant VM locally 
+vagrant box add jasonc/centos7
+or 
+vagrant init bento/ubuntu-18.04
+
+make a dir 
+
+vagrant init 
+
+vagrant up 
+
+vagrant ssh 
+
+once ip is set , will have vm and local shared directory
+config.vm.network "private_network", ip: " "
+
+good practice is to place functions at top of script
+defining before calling 
+
+# if having problems logging in 
+vagrant reload 
+# this reloads configs since last vagrant up 
+
+ for updates 
+ https://www.vagrantup.com/downloads.html
+
+VARIABLES 
+remember the syntax 
+quotes, dollar sign, curly 
+NO spaces for variable assignments 
+By convention, variables are UPPERCASE but not by rule
+
+qdc
+ex:
+if [[ ( "${@}" == "--help") ||  "${@}" == "-h" ]]; then 
+
+
+SPECIAL VARIABLES
+ # "${?}"  means exit code/status of last command
+
+ # ${0} means name of script 
+
+ # "${#}" means number of arguments passed to script
+
+ # "${@}" means all args in list 
+
+
+for guaranteed exit status of 0 
+'false | true'
+set -o pipefail ; 'false | true' 
+
+255 is exit status for an ssh error 
+
+@ vs * 
+
+for USER_NAME in "${@}"	
+# this will treat each arg as one ind arg 
+
+for USER_NAME in "${*}"	
+# this will treat the arg as one even if it is space delimited
+
+from help for 
+The `for' loop executes a sequence of commands for each member in a
+    list of items.  If `in WORDS ...;' is not present, then `in "$@"' is
+    assumed.  For each element in WORDS, NAME is set to that element, and
+    the COMMANDS are executed.
+
+
+
+sudo ssh vs ssh sudo 
+sudo ssh is running as root to given server , (will need password)
+
+command substitution
+ PASS=$(date +%F-%N)" 
+ example of command substitution, in this case to gen a password 
+
+ %F - full date  - equiv. of  %Y-%m-%d
+
+ cut 
+ cut: cut -c1 /etc/passwd
+
+ byte 
+
+ char 
+ there are multi-byte chars such as UTF-8 
+
+ when using cut with csv's , etc. 
+ need to tell cut which delimiter is being used. tab, comma 
+ ex: echo 'name, session, location' | cut -d ',' -f 3 
+ this is telling cut to work off of commas, cutting on the third field 
+
+ ex: cut -d ':' -f1 /etc/passwd
+ this is cutting out first field of /etc/passwd
+
+ grep 
+ grep ^
+ to match on position 
+
+once you start dealing with multiple character delimiters, cut will be limited and awk will become nec. 
+
+ex: awk -F ':' '{print $1,$3}' /etc/passwd
+this will print the first and third fields
+
+awk -F ':' '{print $1,$2}' /etc/passwd
+will print out first and second fields 
+
+ cat syslog-sample | awk -F 'from ' '{print $2 }' | cut -d ' ' -f 1
+ and 
+ cat syslog-sample | awk -F 'from ' '{print $2 }' | awk '{print $1 }'
+display the same output 
+
+-v option to add/assign variables 
+ex: -v  OFS=',' 
+specificies to add a comma to output
+
+variable NF (Number Fields)
+last line of field data 
+ex: $ awk -F ':' '{print $NF}'  /etc/passwd
+/bin/bash
+/sbin/nologin
+/sbin/nologin
+/sbin/nologin
+/sbin/nologin
+/bin/sync
+/sbin/shutdown
+/sbin/halt
+/sbin/nologin
+/sbin/nologin
+/sbin/nologin
+/sbin/nologin
+/sbin/nologin
+/sbin/nologin
+/sbin/nologin
+/sbin/nologin
+/sbin/nologin
+/sbin/nologin
+/sbin/nologin
+/sbin/nologin
+/sbin/nologin
+/sbin/nologin
+/bin/bash
+
+prints out the last line of /etc/passwd
+
+
+sort -u vs uniq
+
+output passed to uniq , have to be sorted beforehand 
+ex: netstat -nutl | grep ':' | awk -F ':' '{print NF}' | sort -n | uniq 
+
+use case
+ sudo cat /var/log/messages | awk '{print $5}'  | sort | uniq -c | sort -n
+
+
+# following gives highest amount of failed logins first 
+grep 'Failed' ${FILE} | awk '{print $(NF - 3 )}' | sort | uniq -c | sort -nr
+
+# gives lowest amount of failed logins first 
+grep 'Failed' ${FILE} | awk '{print $(NF - 3 )}' | sort | uniq -c | sort -n 
+
+sed 
+the / is delimeter 
+sed /'s/michale/michael/' file.txt
+
+sed consists of the search pattern, followed by the replacement string 
+sed /'s/michale/michael/' 
+
+these examples only alter stdout, not the file
+-i option will alter the file 
+ 
+
+
+
+find 
+-looks for files in realtime , slower than locate but up to date 
+
+find -path -options 
+ex:
+find /usr/sbin/ -name userdel
+
+userdel command will delete user/system account entries that refer to account 
+-f will delete even if user is logged in 
+
+sudo userdel [account]
+ll output 
+drwx------  2               1001               1002 4096 Oct 19 02:43 okay
+
+numbers instead of user becasue uid/gid is not assocoiated to an account 
+uid <1000 -indicates a system account 
+
+values for uid selection 
+/etc/login.defs 
+
+tar 
+ -u, --update
+              only appends files newer than copy in archive
+
+  -z 	--gzp, gunzip 
+  				when working with gzip files 
+
+chage will lockout useraccount for passwd auth and even for key-based auth
+passwd will ONLY lock account for passwd based auth   				
+
+tee 
+		read from standard input and write to standard output and files
+-a   --append 
+
+
+
+in luser_06.sh script 
+moved up some messages 
+ex:
+# Append a special character if requested to do so.
+if [[ "${USE_SPECIAL_CHARACTER}" = 'true' ]];then
+  log 'Selecting a random special character.'
+  SPECIAL_CHARACTER=$(echo '!@#$%^&*()_-+=' | fold -w1 | shuf | head -c1)
+  PASSWORD="${PASSWORD}${SPECIAL_CHARACTER}"
+fi
+
+log 'Password generator is done'
+
+echo -e "${PASSWORD}\n"
+
+to 
+
+# Append a special character if requested to do so.
+if [[ "${USE_SPECIAL_CHARACTER}" = 'true' ]];then
+  log 'Selecting a random special character.'
+  SPECIAL_CHARACTER=$(echo '!@#$%^&*()_-+=' | fold -w1 | shuf | head -c1)
+  PASSWORD="${PASSWORD}${SPECIAL_CHARACTER}"
+  echo -e "${PASSWORD}\n"
+  log 'Password generator is done'
+fi
+
+
+what this does, is ensure the echo and log are printed to stdout (the screen) only if the -s flag is utilized.
+Also, log at the end makes more sense sequentially
+This ensures a cleaner output 
+
+
+optind, stores the position of next argument after the last option 
+ex:
+./luser_06.sh -l 44 -a
+here, OPTIND would be 4
+
+./luser_06.sh -l 44 
+here, OPTIND would be 3 
+
+to see value 
+echo ${OPTIND}
+
+
+Newlines
+
+add with \n and echo -e 
+ex:
+echo -e "Run like this: \n./git.sh < within a git project>"
+https://stackoverflow.com/questions/8467424/echo-newline-in-bash-prints-literal-n
+
+-e disables the interpretation of escape characters.
+strangely, -e does not show up in mac when doing man echo / -e
+only in linux
+
+
+/etc/hosts
+
+using lists of addresses and domain names 
+
+can block domains by adding entries in hosts file 
+
+ex:
+127.0.0.1   instagram.com
+https://github.com/drduh/macOS-Security-and-Privacy-Guide#hosts-file
+
+Rsync for backups amongst directories 
+
+ rsync  remote-update  protocol  allows  rsync  to transfer just the differences
+       between two sets of files across the network connection, using an  efficient  check-
+       sum-search  algorithm 
