@@ -41,9 +41,9 @@ while getopts lCA:ADIMIP options ; do
         ;;
     A) 
         filter_option="A"
-        echo "A for Packet Count"
+        echo "A for Packet containing Applications"
         
-    # A for Packet containing Applications, 
+    
     # AD for Packets Containing Audio, 
     # I for Packets containing an Image, 
     # MI For Pacets containing Multiple Images or 
